@@ -1,0 +1,146 @@
+#!/bin/bash
+
+# Script: system_info_report.sh
+# Description: This script collects system information, examines CPU load, memory utilization, and disk usage,
+# records the report to "system_info_report.log," creates an archive file, and displays a menu for user interaction.
+
+# Function to gather system information and log to system_info_report.log
+
+gather_system_info() {
+    echo "System Information:"
+    echo "Hostname: $(hostname)"
+    echo "Operating System: $(uname -s)"
+    echo "Kernel Version: $(uname -r)"
+    echo "CPU Information:"
+    lscpu | grep "Model name"
+    echo "Total Memory: $(free -m | awk '/^Mem:/ {print $2}')"
+    echo "Free Memory: $(free -m | awk '/^Mem:/ {print $4}')"
+    echo "Disk Usage Information:"
+    df -h /
+    echo "------------------------------"
+
+
+    # Log the system report to system_info_report.log
+
+    echo "System Information:" >> system_info_report.log
+    echo "Hostname: $(hostname)" >> system_info_report.log
+    echo "Operating System: $(uname -s)" >> system_info_report.log
+    echo "Kernel Version: $(uname -r)" >> system_info_report.log
+    echo "CPU Information:" >> system_info_report.log
+    lscpu | grep "Model name" >> system_info_report.log
+    echo "Total Memory: $(free -h | awk '/^Mem:/ {print $2}')" >> system_info_report.log
+    echo "Free Memory: $(free -h | awk '/^Mem:/ {print $4}')" >> system_info_report.log
+    echo "Disk Usage Information:" >> system_info_report.log
+    df -h / >> system_info_report.log
+    echo "------------------------------" >> system_info_report.log
+
+    
+# Call functions to check CPU load, memory usage, and disk usage
+
+    check_cpu_status
+    check_memory_status
+    check_disk_status
+
+    echo "System information has been logged to system_info_report.log."
+}
+
+
+# Function to check CPU load and display a message
+
+check_cpu_status() {
+    local load_threshold=80
+    local current_load=$(uptime | awk -F 'load average: ' '{print $2}' | cut -d ',' -f 1 | awk '{print $NF}')
+    
+    # Convert current_load to an integer (remove decimal point) for comparison 
+    local current_load_int=$(printf "%.0f" "$current_load")
+
+    if (( current_load_int > load_threshold )); then
+        echo "Warning: CPU load is ${current_load}% and exceeds the threshold of ${load_threshold}%."
+    else
+        echo "SUCCESS: CPU load is within acceptable limits (${current_load}%)."
+    fi
+}
+
+
+# Function to check memory usage and display a message 
+
+check_memory_status() {
+    local memory_threshold=50
+    local used_memory=$(free -m | awk '/^Mem:/ {print $3}')
+    local total_memory=$(free -m | awk '/^Mem:/ {print $2}')
+    local memory_usage_percentage=$(( used_memory * 100 / total_memory ))
+    if (( memory_usage_percentage > memory_threshold )); then
+        echo "Warning: Memory usage is ${memory_usage_percentage}% and exceeds the threshold of ${memory_threshold}%."
+    else
+        echo "SUCCESS: Memory usage is within acceptable limits (${memory_usage_percentage}%) "
+    fi
+}
+
+
+# Function to check disk usage and display a message 
+
+check_disk_status() {
+    local disk_threshold=70
+    local disk_usage_percentage=$(df -h / | awk '/\// {print $5}' | tr -d '%')
+    if (( disk_usage_percentage > disk_threshold )); then
+        echo "Warning: Disk usage is ${disk_usage_percentage}% and exceeds the threshold of ${disk_threshold}%."
+    else
+        echo "SUCCESS: Disk usage is within acceptable limits (${disk_usage_percentage}%) "
+    fi
+}
+
+
+# Function to create a compressed archive of the log file 
+
+create_archive() {
+    if [ -f "system_info_report.log" ]; then
+        echo "system_info_report.log exists. Creating compressed archive..."
+    else
+        echo "Error: Log file does not exist or is empty. Generating a new report before creating the archive."
+        touch system_info_report.log
+    fi
+
+    tar -czvf system_info_report.tar.gz system_info_report.log
+    echo "Archive created successfully."
+}
+
+
+# Main menu function / Mohamed Attia / July 29th, 2023.
+
+main_menu() {
+    while true; do
+        echo "System Monitoring and Reporting"
+        echo "++++++++++++++++++++++++++++++++++++++++++"
+        echo "1. Generate System Report"
+        echo "2. Create Archive"
+        echo "3. Exit"
+        echo "++++++++++++++++++++++++++++++++++++++++++"
+
+        read -p "Enter your choice: " choice
+
+        case $choice in
+            1)
+                gather_system_info
+                ;;
+            2)
+                if [ ! -f "system_info_report.log" ]; then
+                    echo "system_info_report.log does not exist. Creating a new log file..."
+                    touch system_info_report.log
+                fi
+                create_archive
+                ;;
+            3)
+                echo "Exiting the script."
+                exit 0
+                ;;
+            *)
+                echo "Invalid option! Please choose a valid menu item."
+                ;;
+        esac
+    done
+}
+
+
+# Call the main menu function 
+
+main_menu
