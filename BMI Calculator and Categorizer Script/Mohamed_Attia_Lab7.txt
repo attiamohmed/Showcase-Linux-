@@ -1,0 +1,43 @@
+#!/bin/bash
+# Description: This script calculates the Body Mass Index (BMI) based on user-provided weight and height values.
+
+# Algorithm:
+# 1. Clear the screen.
+# 2. Prompt the user to enter their weight and height.
+#    - Enter your height in m:
+#    - Enter your weight in kg:
+# 3. Calculate the BMI.
+#    - Use the weight and height values to calculate the BMI using the formula:
+#      BMI = weight / (height * height)
+# 4. Determine the BMI category.
+#    - Use if-elif-else statements to categorize the BMI into different categories based on the following ranges:
+#      1. BMI < 18.5: Underweight
+#      2. 18.5 <= BMI < 25: Normal weight
+#      3. 25 <= BMI < 30: Overweight
+#      4. BMI >= 30: Obesity
+# 5. Display the BMI and category in the specified output format.
+
+# Clear the screen
+clear
+
+# Prompt the user for weight and height
+read -p "Enter your height in m: " height
+read -p "Enter your weight in kg: " weight
+
+# Calculate the BMI
+bmi=$(echo "scale=2; $weight / ($height * $height)" | bc)
+
+# Determine the BMI category
+if (( $(echo "$bmi < 18.5" | bc -l) )); then
+  category="Underweight"
+elif (( $(echo "$bmi < 25" | bc -l) )); then
+  category="Normal Weight"
+elif (( $(echo "$bmi < 30" | bc -l) )); then
+  category="Overweight"
+else
+  category="Obesity"
+fi
+
+# Display the BMI and category
+echo "Your BMI is: $bmi"
+echo "Category: $category"
