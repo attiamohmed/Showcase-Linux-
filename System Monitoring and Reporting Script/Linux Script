@@ -105,7 +105,7 @@ create_archive() {
 }
 
 
-# Main menu function / Mohamed Attia / July 29th, 2023.
+# Main menu function
 
 main_menu() {
     while true; do
