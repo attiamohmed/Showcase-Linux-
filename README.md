@@ -14,8 +14,6 @@ The "System Info Report" script collects essential system information, such as h
 
 ## Usage
 
-## Usage
-
 To use these scripts on your Linux system, please refer to the README files provided within each script's directory for specific usage instructions.
 
 ## Contributing
