@@ -14,10 +14,9 @@ The "System Info Report" script collects essential system information, such as h
 
 ## Usage
 
-To use these scripts on your Linux system, follow the instructions provided in the respective README files within each script's directory:
+## Usage
 
-- [BMI Calculator README](bmi_calculator/README.md)
-- [System Info Report README](system_info_report/README.md)
+To use these scripts on your Linux system, please refer to the README files provided within each script's directory for specific usage instructions.
 
 ## Contributing
 
